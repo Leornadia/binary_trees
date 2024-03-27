@@ -1,0 +1,88 @@
+#include "binary_trees.h" 
+
+/**
+ * find_min_node - Finds the node with the minimum value within a BST subtree.
+ * @node: Pointer to the root node of the subtree.
+ * Return: Pointer to the node with the minimum value.
+ */
+bst_t *find_min_node(bst_t *node)
+{
+    bst_t *current = node;
+    while (current && current->left != NULL)
+        current = current->left;
+    return current;
+}
+
+/**
+ * bst_insert - Inserts a new node into a Binary Search Tree.
+ * @tree: Double pointer to the root of the BST.
+ * @value: Value to be inserted.
+ * Return: Pointer to the newly created node, or NULL on failure.
+ */
+bst_t *bst_insert(bst_t **tree, int value)
+{
+    if (*tree == NULL) {
+        *tree = binary_tree_node(*tree, value); /* Your node creation function */
+        return *tree;
+    }
+
+    if (value < (*tree)->n)
+        return bst_insert(&((*tree)->left), value);
+    else if (value > (*tree)->n)
+        return bst_insert(&((*tree)->right), value);
+    else
+        return NULL;  /* No duplicate values in this BST */
+}
+
+/**
+ * bst_search - Searches for a value in a BST.
+ * @tree: Pointer to the root node of the BST.
+ * @value: Value to search for.
+ * Return: Pointer to the found node, or NULL if not found.
+ */
+bst_t *bst_search(const bst_t *tree, int value)
+{
+    if (tree == NULL || tree->n == value)
+        return (bst_t *)tree; 
+
+    if (value < tree->n)
+        return bst_search(tree->left, value);
+    else 
+        return bst_search(tree->right, value);
+}
+
+/**
+ * bst_remove - Removes a node from a Binary Search Tree.
+ * @root: Double pointer to the root node of the BST.
+ * @value: Value to be removed.
+ * Return: Pointer to the new root of the BST.
+ */
+bst_t *bst_remove(bst_t *root, int value)
+{
+    if (root == NULL)
+        return NULL; 
+
+    if (value < root->n) 
+        root->left = bst_remove(root->left, value);
+    else if (value > root->n)
+        root->right = bst_remove(root->right, value);
+    else { 
+        /* Node with one child or no child */
+        if (root->left == NULL) {
+            bst_t *temp = root->right; 
+            free(root); 
+            return temp;
+        } else if (root->right == NULL) {
+            bst_t *temp = root->left; 
+            free(root); 
+            return temp;
+        }
+
+        /* Node with two children: Find inorder successor */
+        bst_t *temp = find_min_node(root->right); 
+        root->n = temp->n;  
+        root->right = bst_remove(root->right, temp->n); 
+    } 
+    return root; 
+}
+
